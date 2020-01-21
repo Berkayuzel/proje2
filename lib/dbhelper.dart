@@ -34,16 +34,32 @@ class DBHelper{
     return ozet;
 
   }
-  Future<List<Ozet>> getOzet()async{
+  Future<List<Ozet>> getOzet() async{
     var dbClient = await db;
     List<Map> maps = await dbClient.query(TABLE,columns: [ID,MIKTAR,NEDEN]);
     List<Ozet> ozet = [];
-    if(maps.length>0){
-      for(int i=0; i<maps.length; i++){
+    if(maps.length>0) {
+      for (int i = 0; i < maps.length; i++) {
         ozet.add(Ozet.fromMap(maps[i]));
       }
     }
     return ozet;
+  }
+
+  Future<Ozet> getMiktar() async{
+    var dbClient = await db;
+    List<Map> maps=await dbClient.query(TABLE,columns:[MIKTAR]);
+    Ozet ozet;
+    if(maps.length>0){
+      for(int i = 0; i<maps.length;i++){
+
+        ozet.miktar+=(Ozet.fromMap(maps[i]).miktar);
+
+      }
+    }
+
+    return ozet;
+
   }
   Future close()async{
     var dbClient =await db;

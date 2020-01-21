@@ -1,75 +1,118 @@
-import 'package:proje/constant.dart';
 import 'package:flutter/material.dart';
-
+import 'package:proje/dbhelper.dart';
+import 'package:proje/dbözet.dart';
+import 'dart:async';
 
 class HarcamaScreen extends StatefulWidget {
-  static String id= 'harcamasc';
+  static String id = 'harcamasc';
+  final String title;
+  HarcamaScreen({Key key, this.title}) : super(key: key);
   @override
-  _HarcamaScreenState createState() => _HarcamaScreenState();
+  State<StatefulWidget> createState() {
+    return _HarcamaScreenState();
+  }
 }
 
 class _HarcamaScreenState extends State<HarcamaScreen> {
+  Future<List<Ozet>> ozet;
+  TextEditingController controller = TextEditingController();
+  String neden;
+  int curMiktar;
+  int id;
+  final formKey = new GlobalKey<FormState>();
+  var dbHelper;
+  bool isUpdating;
+  @override
+  void initState() {
+    dbHelper = DBHelper();
+    isUpdating = false;
+    refreshList();
+  }
+
+  refreshList() {
+    setState(() {
+      ozet = dbHelper.getOzet();
+    });
+  }
+
+  clearName() {
+    controller.text = '';
+  }
+
+  validate() {
+    if (formKey.currentState.validate()) {
+      formKey.currentState.save();
+      if (isUpdating) {
+        Ozet o = Ozet(curMiktar, neden, id);
+        dbHelper.update(o);
+        setState(() {
+          isUpdating = false;
+        });
+      } else {
+        Ozet o = Ozet(null, neden, id);
+        dbHelper.save(o);
+      }
+      clearName();
+      refreshList();
+    }
+  }
+
+  form() {
+    return Form(
+      key: formKey,
+      child: Padding(
+        padding: EdgeInsets.all(15.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          verticalDirection: VerticalDirection.down,
+          children: <Widget>[
+            TextFormField(
+              controller: controller,
+              keyboardType: TextInputType.text,
+              decoration: InputDecoration(labelText: 'Miktar'),
+              validator: (val) => val.length == 0 ? 'Miktar Gir' : null,
+              onSaved: (val) => neden = val,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                FlatButton(
+                  onPressed: validate,
+                  child: Text(isUpdating ? 'Update' : 'Harca'),
+                ),
+                FlatButton(
+                  onPressed: () {
+                    setState(() {
+                      isUpdating = false;
+                    });
+                    clearName();
+                  },
+                  child: Text('Sil'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomPadding: false,
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Hero(
-                tag: 'logo',
-                child: Container(
-                  height: 200.0,
-                  child: Image.asset('images/cüzdan.jpg'),
-                ),
-              ),
-              SizedBox(
-                height: 48.0,
-              ),
-              TextField(
-                onChanged: (value) {
-                },
-                decoration:
-                kTextFieldDecoration.copyWith(hintText: 'Harcama Miktarı'),
-              ),
-              SizedBox(
-                height: 8.0,
-              ),
-              TextField(
-                  onChanged: (value) {
-                  },
-                  decoration: kTextFieldDecoration.copyWith(
-                      hintText: 'Harcama Nedeni'
-                  )
-              ),
-              SizedBox(
-                height: 24.0,
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: 16.0),
-                child: Material(
-                  color: Colors.red,
-                  borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                  elevation: 5.0,
-                  child: MaterialButton(
-                    onPressed: () {
-                    },
-                    minWidth: 200.0,
-                    height: 42.0,
-                    child: Text(
-                      'Harca',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+    return new Scaffold(
+      appBar: new AppBar(
+        title: new Text('Para Harca'),
+      ),
+      body: new Container(
+        child: new Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          verticalDirection: VerticalDirection.down,
+          children: <Widget>[
+            form(),
+          ],
         ),
       ),
     );

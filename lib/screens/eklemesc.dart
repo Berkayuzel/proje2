@@ -79,7 +79,7 @@ class _EklemeScreenState extends State<EklemeScreen> {
               children: <Widget>[
                 FlatButton(
                   onPressed: validate,
-                  child: Text(isUpdating ? 'Update' : 'ADD'),
+                  child: Text(isUpdating ? 'Update' : 'Ekle'),
                 ),
                 FlatButton(
                   onPressed: () {
@@ -88,7 +88,7 @@ class _EklemeScreenState extends State<EklemeScreen> {
                     });
                     clearName();
                   },
-                  child: Text('Cancel'),
+                  child: Text('Sil'),
                 ),
               ],
             ),
@@ -98,46 +98,6 @@ class _EklemeScreenState extends State<EklemeScreen> {
     );
   }
 
-  SingleChildScrollView dataTable(List<Ozet> ozet) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.vertical,
-      child: DataTable(
-        columns: [
-          DataColumn(label: Text('Neden')),
-        ],
-        rows: ozet
-            .map(
-              (ozet) => DataRow(cells: [
-                DataCell(Text(ozet.neden), onTap: () {
-                  setState(() {
-                    isUpdating = true;
-                    curMiktar = ozet.miktar;
-                  });
-                  controller.text = ozet.neden;
-                }),
-              ]),
-            )
-            .toList(),
-      ),
-    );
-  }
-
-  list() {
-    return Expanded(
-      child: FutureBuilder(
-        future: ozet,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return dataTable(snapshot.data);
-          }
-          if (null == snapshot.data || snapshot.data.lenght == 0) {
-            return Text('No data found');
-          }
-          return CircularProgressIndicator();
-        },
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -152,7 +112,6 @@ class _EklemeScreenState extends State<EklemeScreen> {
           verticalDirection: VerticalDirection.down,
           children: <Widget>[
             form(),
-            list(),
           ],
         ),
       ),

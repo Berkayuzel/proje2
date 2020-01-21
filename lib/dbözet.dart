@@ -4,7 +4,7 @@ class Ozet{
   String neden;
   Ozet(this.miktar,this.neden,this.id);
 
-  Map<String, dynamic>toMap(){
+  Map<String, dynamic> toMap(){
     var map =<String, dynamic>{
       'id' : id,
       'miktar': miktar,
@@ -12,10 +12,12 @@ class Ozet{
     };
     return map;
   }
-  Ozet.fromMap(Map<String, dynamic>map){
-    id = map['id'];
-    miktar = map['miktar'];
-    neden = map['neden'];
+
+
+  Ozet.fromMap(Map<String,dynamic> map){
+    id = map['id'] ?? null;
+    miktar = map['miktar'] ?? null;
+    neden = map['neden'] ?? null;
 
   }
 }
